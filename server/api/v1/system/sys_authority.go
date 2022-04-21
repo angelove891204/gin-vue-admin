@@ -1,20 +1,19 @@
 package system
 
 import (
-	"gin-vue-admin/global"
-	"gin-vue-admin/model/common/request"
-	"gin-vue-admin/model/common/response"
-	"gin-vue-admin/model/system"
-	systemReq "gin-vue-admin/model/system/request"
-	systemRes "gin-vue-admin/model/system/response"
-	"gin-vue-admin/utils"
+	"github.com/flipped-aurora/gin-vue-admin/server/global"
+	"github.com/flipped-aurora/gin-vue-admin/server/model/common/request"
+	"github.com/flipped-aurora/gin-vue-admin/server/model/common/response"
+	"github.com/flipped-aurora/gin-vue-admin/server/model/system"
+	systemReq "github.com/flipped-aurora/gin-vue-admin/server/model/system/request"
+	systemRes "github.com/flipped-aurora/gin-vue-admin/server/model/system/response"
+	"github.com/flipped-aurora/gin-vue-admin/server/utils"
 
 	"github.com/gin-gonic/gin"
 	"go.uber.org/zap"
 )
 
-type AuthorityApi struct {
-}
+type AuthorityApi struct{}
 
 // @Tags Authority
 // @Summary 创建角色
@@ -32,7 +31,7 @@ func (a *AuthorityApi) CreateAuthority(c *gin.Context) {
 		return
 	}
 	if err, authBack := authorityService.CreateAuthority(authority); err != nil {
-		global.GVA_LOG.Error("创建失败!", zap.Any("err", err))
+		global.GVA_LOG.Error("创建失败!", zap.Error(err))
 		response.FailWithMessage("创建失败"+err.Error(), c)
 	} else {
 		_ = menuService.AddMenuAuthority(systemReq.DefaultMenu(), authority.AuthorityId)
@@ -61,7 +60,7 @@ func (a *AuthorityApi) CopyAuthority(c *gin.Context) {
 		return
 	}
 	if err, authBack := authorityService.CopyAuthority(copyInfo); err != nil {
-		global.GVA_LOG.Error("拷贝失败!", zap.Any("err", err))
+		global.GVA_LOG.Error("拷贝失败!", zap.Error(err))
 		response.FailWithMessage("拷贝失败"+err.Error(), c)
 	} else {
 		response.OkWithDetailed(systemRes.SysAuthorityResponse{Authority: authBack}, "拷贝成功", c)
@@ -84,7 +83,7 @@ func (a *AuthorityApi) DeleteAuthority(c *gin.Context) {
 		return
 	}
 	if err := authorityService.DeleteAuthority(&authority); err != nil { // 删除角色之前需要判断是否有用户正在使用此角色
-		global.GVA_LOG.Error("删除失败!", zap.Any("err", err))
+		global.GVA_LOG.Error("删除失败!", zap.Error(err))
 		response.FailWithMessage("删除失败"+err.Error(), c)
 	} else {
 		response.OkWithMessage("删除成功", c)
@@ -107,7 +106,7 @@ func (a *AuthorityApi) UpdateAuthority(c *gin.Context) {
 		return
 	}
 	if err, authority := authorityService.UpdateAuthority(auth); err != nil {
-		global.GVA_LOG.Error("更新失败!", zap.Any("err", err))
+		global.GVA_LOG.Error("更新失败!", zap.Error(err))
 		response.FailWithMessage("更新失败"+err.Error(), c)
 	} else {
 		response.OkWithDetailed(systemRes.SysAuthorityResponse{Authority: authority}, "更新成功", c)
@@ -130,7 +129,7 @@ func (a *AuthorityApi) GetAuthorityList(c *gin.Context) {
 		return
 	}
 	if err, list, total := authorityService.GetAuthorityInfoList(pageInfo); err != nil {
-		global.GVA_LOG.Error("获取失败!", zap.Any("err", err))
+		global.GVA_LOG.Error("获取失败!", zap.Error(err))
 		response.FailWithMessage("获取失败"+err.Error(), c)
 	} else {
 		response.OkWithDetailed(response.PageResult{
@@ -158,7 +157,7 @@ func (a *AuthorityApi) SetDataAuthority(c *gin.Context) {
 		return
 	}
 	if err := authorityService.SetDataAuthority(auth); err != nil {
-		global.GVA_LOG.Error("设置失败!", zap.Any("err", err))
+		global.GVA_LOG.Error("设置失败!", zap.Error(err))
 		response.FailWithMessage("设置失败"+err.Error(), c)
 	} else {
 		response.OkWithMessage("设置成功", c)

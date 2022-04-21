@@ -2,9 +2,10 @@ package system
 
 import (
 	"errors"
-	"gin-vue-admin/global"
-	"gin-vue-admin/model/system"
-	"gin-vue-admin/model/system/request"
+
+	"github.com/flipped-aurora/gin-vue-admin/server/global"
+	"github.com/flipped-aurora/gin-vue-admin/server/model/system"
+	"github.com/flipped-aurora/gin-vue-admin/server/model/system/request"
 	"gorm.io/gorm"
 )
 
@@ -14,8 +15,7 @@ import (
 //@param: sysDictionary model.SysDictionary
 //@return: err error
 
-type DictionaryService struct {
-}
+type DictionaryService struct{}
 
 func (dictionaryService *DictionaryService) CreateSysDictionary(sysDictionary system.SysDictionary) (err error) {
 	if (!errors.Is(global.GVA_DB.First(&system.SysDictionary{}, "type = ?", sysDictionary.Type).Error, gorm.ErrRecordNotFound)) {
@@ -51,15 +51,12 @@ func (dictionaryService *DictionaryService) UpdateSysDictionary(sysDictionary *s
 		"Desc":   sysDictionary.Desc,
 	}
 	db := global.GVA_DB.Where("id = ?", sysDictionary.ID).First(&dict)
-	if dict.Type == sysDictionary.Type {
-		err = db.Updates(sysDictionaryMap).Error
-	} else {
-		if (!errors.Is(global.GVA_DB.First(&system.SysDictionary{}, "type = ?", sysDictionary.Type).Error, gorm.ErrRecordNotFound)) {
+	if dict.Type != sysDictionary.Type {
+		if !errors.Is(global.GVA_DB.First(&system.SysDictionary{}, "type = ?", sysDictionary.Type).Error, gorm.ErrRecordNotFound) {
 			return errors.New("存在相同的type，不允许创建")
 		}
-		err = db.Updates(sysDictionaryMap).Error
-
 	}
+	err = db.Updates(sysDictionaryMap).Error
 	return err
 }
 
@@ -70,7 +67,7 @@ func (dictionaryService *DictionaryService) UpdateSysDictionary(sysDictionary *s
 //@return: err error, sysDictionary model.SysDictionary
 
 func (dictionaryService *DictionaryService) GetSysDictionary(Type string, Id uint) (err error, sysDictionary system.SysDictionary) {
-	err = global.GVA_DB.Where("type = ? OR id = ?", Type, Id).Preload("SysDictionaryDetails").First(&sysDictionary).Error
+	err = global.GVA_DB.Where("type = ? OR id = ? and status = ?", Type, Id, true).Preload("SysDictionaryDetails", "status = ?", true).First(&sysDictionary).Error
 	return
 }
 
@@ -101,6 +98,9 @@ func (dictionaryService *DictionaryService) GetSysDictionaryInfoList(info reques
 		db = db.Where("`desc` LIKE ?", "%"+info.Desc+"%")
 	}
 	err = db.Count(&total).Error
+	if err != nil {
+		return
+	}
 	err = db.Limit(limit).Offset(offset).Find(&sysDictionarys).Error
 	return err, sysDictionarys, total
 }

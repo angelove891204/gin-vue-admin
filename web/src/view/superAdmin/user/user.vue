@@ -1,90 +1,113 @@
 <template>
   <div>
-    <div class="button-box clearflex">
-      <el-button size="mini" type="primary" icon="el-icon-plus" @click="addUser">新增用户</el-button>
+    <warning-bar title="注：右上角头像下拉可切换角色" />
+    <div class="gva-table-box">
+      <div class="gva-btn-list">
+        <el-button size="mini" type="primary" icon="plus" @click="addUser">新增用户</el-button>
+      </div>
+      <el-table :data="tableData">
+        <el-table-column align="left" label="头像" min-width="50">
+          <template #default="scope">
+            <CustomPic style="margin-top:8px" :pic-src="scope.row.headerImg" />
+          </template>
+        </el-table-column>
+        <el-table-column align="left" label="UUID" min-width="250" prop="uuid" />
+        <el-table-column align="left" label="用户名" min-width="150" prop="userName" />
+        <el-table-column align="left" label="昵称" min-width="100" prop="nickName">
+          <template #default="scope">
+            <p v-if="!scope.row.editFlag" class="nickName">{{ scope.row.nickName }}
+              <el-icon class="pointer" color="#66b1ff" @click="openEidt(scope.row)">
+                <edit />
+              </el-icon>
+            </p>
+            <p v-if="scope.row.editFlag" class="nickName">
+              <el-input v-model="scope.row.nickName" />
+              <el-icon class="pointer" color="#67c23a" @click="enterEdit(scope.row)">
+                <check />
+              </el-icon>
+              <el-icon class="pointer" color="#f23c3c" @click="closeEdit(scope.row)">
+                <close />
+              </el-icon>
+            </p>
+          </template>
+        </el-table-column>
+        <el-table-column align="left" label="用户角色" min-width="150">
+          <template #default="scope">
+            <el-cascader
+              v-model="scope.row.authorityIds"
+              :options="authOptions"
+              :show-all-levels="false"
+              collapse-tags
+              :props="{ multiple:true,checkStrictly: true,label:'authorityName',value:'authorityId',disabled:'disabled',emitPath:false}"
+              :clearable="false"
+              @visible-change="(flag)=>{changeAuthority(scope.row,flag)}"
+              @remove-tag="()=>{changeAuthority(scope.row,false)}"
+            />
+          </template>
+        </el-table-column>
+        <el-table-column align="left" label="操作" min-width="150">
+          <template #default="scope">
+            <el-popover :visible="scope.row.visible" placement="top" width="160">
+              <p>确定要删除此用户吗</p>
+              <div style="text-align: right; margin-top: 8px;">
+                <el-button size="mini" type="text" @click="scope.row.visible = false">取消</el-button>
+                <el-button type="primary" size="mini" @click="deleteUser(scope.row)">确定</el-button>
+              </div>
+              <template #reference>
+                <el-button type="text" icon="delete" size="mini">删除</el-button>
+              </template>
+            </el-popover>
+            <el-button type="text" icon="magic-stick" size="mini" @click="resetPassword(scope.row)">重置密码</el-button>
+          </template>
+        </el-table-column>
+      </el-table>
+      <div class="gva-pagination">
+        <el-pagination
+          :current-page="page"
+          :page-size="pageSize"
+          :page-sizes="[10, 30, 50, 100]"
+          :total="total"
+          layout="total, sizes, prev, pager, next, jumper"
+          @current-change="handleCurrentChange"
+          @size-change="handleSizeChange"
+        />
+      </div>
     </div>
-    <el-table :data="tableData" border stripe>
-      <el-table-column label="头像" min-width="50">
-        <template slot-scope="scope">
-          <div :style="{'textAlign':'center'}">
-            <CustomPic :pic-src="scope.row.headerImg" />
-          </div>
-        </template>
-      </el-table-column>
-      <el-table-column label="uuid" min-width="250" prop="uuid" />
-      <el-table-column label="用户名" min-width="150" prop="userName" />
-      <el-table-column label="昵称" min-width="150" prop="nickName" />
-      <el-table-column label="用户角色" min-width="150">
-        <template slot-scope="scope">
+    <el-dialog v-model="addUserDialog" custom-class="user-dialog" title="新增用户">
+      <el-form ref="userForm" :rules="rules" :model="userInfo" label-width="80px">
+        <el-form-item label="用户名" prop="username">
+          <el-input v-model="userInfo.username" />
+        </el-form-item>
+        <el-form-item label="密码" prop="password">
+          <el-input v-model="userInfo.password" />
+        </el-form-item>
+        <el-form-item label="别名" prop="nickName">
+          <el-input v-model="userInfo.nickName" />
+        </el-form-item>
+        <el-form-item label="用户角色" prop="authorityId">
           <el-cascader
-            v-model="scope.row.authorityIds"
+            v-model="userInfo.authorityIds"
+            style="width:100%"
             :options="authOptions"
             :show-all-levels="false"
             :props="{ multiple:true,checkStrictly: true,label:'authorityName',value:'authorityId',disabled:'disabled',emitPath:false}"
-            filterable
             :clearable="false"
-            @visible-change="(flag)=>{changeAuthority(scope.row,flag)}"
-            @remove-tag="()=>{changeAuthority(scope.row,false)}"
           />
-        </template>
-      </el-table-column>
-      <el-table-column label="操作" min-width="150">
-        <template slot-scope="scope">
-          <el-popover v-model="scope.row.visible" placement="top" width="160">
-            <p>确定要删除此用户吗</p>
-            <div style="text-align: right; margin: 0">
-              <el-button size="mini" type="text" @click="scope.row.visible = false">取消</el-button>
-              <el-button type="primary" size="mini" @click="deleteUser(scope.row)">确定</el-button>
-            </div>
-            <el-button slot="reference" type="danger" icon="el-icon-delete" size="mini">删除</el-button>
-          </el-popover>
-        </template>
-      </el-table-column>
-    </el-table>
-    <span style="color: red;font-size: 12px">注：右上角头像下拉可切换角色</span>
-    <el-pagination
-      :current-page="page"
-      :page-size="pageSize"
-      :page-sizes="[10, 30, 50, 100]"
-      :style="{float:'right',padding:'20px'}"
-      :total="total"
-      layout="total, sizes, prev, pager, next, jumper"
-      @current-change="handleCurrentChange"
-      @size-change="handleSizeChange"
-    />
-
-    <el-dialog :visible.sync="addUserDialog" custom-class="user-dialog" title="新增用户">
-      <el-form ref="userForm" :rules="rules" :model="userInfo">
-        <el-form-item label="用户名" label-width="80px" prop="username">
-          <el-input v-model="userInfo.username" />
-        </el-form-item>
-        <el-form-item label="密码" label-width="80px" prop="password">
-          <el-input v-model="userInfo.password" />
-        </el-form-item>
-        <el-form-item label="别名" label-width="80px" prop="nickName">
-          <el-input v-model="userInfo.nickName" />
         </el-form-item>
         <el-form-item label="头像" label-width="80px">
           <div style="display:inline-block" @click="openHeaderChange">
-            <img v-if="userInfo.headerImg" class="header-img-box" :src="userInfo.headerImg">
+            <img v-if="userInfo.headerImg" class="header-img-box" :src="(userInfo.headerImg && userInfo.headerImg.slice(0, 4) !== 'http')?path+userInfo.headerImg:userInfo.headerImg">
             <div v-else class="header-img-box">从媒体库选择</div>
           </div>
         </el-form-item>
-        <el-form-item label="用户角色" label-width="80px" prop="authorityId">
-          <el-cascader
-            v-model="userInfo.authorityIds"
-            :options="authOptions"
-            :show-all-levels="false"
-            :props="{ multiple:true,checkStrictly: true,label:'authorityName',value:'authorityId',disabled:'disabled',emitPath:false}"
-            filterable
-            :clearable="false"
-          />
-        </el-form-item>
+
       </el-form>
-      <div slot="footer" class="dialog-footer">
-        <el-button @click="closeAddUserDialog">取 消</el-button>
-        <el-button type="primary" @click="enterAddUserDialog">确 定</el-button>
-      </div>
+      <template #footer>
+        <div class="dialog-footer">
+          <el-button size="small" @click="closeAddUserDialog">取 消</el-button>
+          <el-button size="small" type="primary" @click="enterAddUserDialog">确 定</el-button>
+        </div>
+      </template>
     </el-dialog>
     <ChooseImg ref="chooseImg" :target="userInfo" :target-key="`headerImg`" />
   </div>
@@ -92,7 +115,7 @@
 
 <script>
 // 获取列表内容封装在mixins内部  getTableData方法 初始化已封装完成
-const path = process.env.VUE_APP_BASE_API
+const path = import.meta.env.VITE_BASE_API
 import {
   getUserList,
   setUserAuthorities,
@@ -102,11 +125,13 @@ import {
 import { getAuthorityList } from '@/api/authority'
 import infoList from '@/mixins/infoList'
 import { mapGetters } from 'vuex'
-import CustomPic from '@/components/customPic'
-import ChooseImg from '@/components/chooseImg'
+import CustomPic from '@/components/customPic/index.vue'
+import ChooseImg from '@/components/chooseImg/index.vue'
+import warningBar from '@/components/warningBar/warningBar.vue'
+import { setUserInfo, resetPassword } from '@/api/user.js'
 export default {
   name: 'Api',
-  components: { CustomPic, ChooseImg },
+  components: { CustomPic, ChooseImg, warningBar },
   mixins: [infoList],
   data() {
     return {
@@ -114,6 +139,7 @@ export default {
       path: path,
       authOptions: [],
       addUserDialog: false,
+      backNickName: '',
       userInfo: {
         username: '',
         password: '',
@@ -143,19 +169,49 @@ export default {
   computed: {
     ...mapGetters('user', ['token'])
   },
+  watch: {
+    tableData() {
+      this.setAuthorityIds()
+    }
+  },
   async created() {
     await this.getTableData()
-    this.setAuthorityIds()
     const res = await getAuthorityList({ page: 1, pageSize: 999 })
     this.setOptions(res.data.list)
   },
   methods: {
+    resetPassword(row) {
+      this.$confirm(
+        '是否将此用户密码重置为123456?',
+        '警告',
+        {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          type: 'warning',
+        }
+      ).then(async() => {
+        const res = await resetPassword({
+          ID: row.ID,
+        })
+        if (res.code === 0) {
+          this.$message({
+            type: 'success',
+            message: res.msg,
+          })
+        } else {
+          this.$message({
+            type: 'error',
+            message: res.msg,
+          })
+        }
+      })
+    },
     setAuthorityIds() {
       this.tableData && this.tableData.forEach((user) => {
         const authorityIds = user.authorities && user.authorities.map(i => {
           return i.authorityId
         })
-        this.$set(user, 'authorityIds', authorityIds)
+        user.authorityIds = authorityIds
       })
     },
     openHeaderChange() {
@@ -165,9 +221,33 @@ export default {
       this.authOptions = []
       this.setAuthorityOptions(authData, this.authOptions)
     },
+    openEidt(row) {
+      if (this.tableData.some(item => item.editFlag)) {
+        this.$message('当前存在正在编辑的用户')
+        return
+      }
+      this.backNickName = row.nickName
+      row.editFlag = true
+    },
+    async enterEdit(row) {
+      const res = await setUserInfo({ nickName: row.nickName, ID: row.ID })
+      if (res.code === 0) {
+        this.$message({
+          type: 'success',
+          message: '设置成功'
+        })
+      }
+      this.backNickName = ''
+      row.editFlag = false
+    },
+    closeEdit(row) {
+      row.nickName = this.backNickName
+      this.backNickName = ''
+      row.editFlag = false
+    },
     setAuthorityOptions(AuthorityData, optionsData) {
       AuthorityData &&
-        AuthorityData.map(item => {
+        AuthorityData.forEach(item => {
           if (item.children && item.children.length) {
             const option = {
               authorityId: item.authorityId,
@@ -190,7 +270,6 @@ export default {
       if (res.code === 0) {
         this.$message.success('删除成功')
         await this.getTableData()
-        this.setAuthorityIds()
         row.visible = false
       }
     },
@@ -203,13 +282,14 @@ export default {
             this.$message({ type: 'success', message: '创建成功' })
           }
           await this.getTableData()
-          this.setAuthorityIds()
           this.closeAddUserDialog()
         }
       })
     },
     closeAddUserDialog() {
       this.$refs.userForm.resetFields()
+      this.userInfo.headerImg = ''
+      this.userInfo.authorityIds = []
       this.addUserDialog = false
     },
     addUser() {
@@ -228,19 +308,12 @@ export default {
           this.$message({ type: 'success', message: '角色设置成功' })
         }
       })
-    }
+    },
   }
 }
 </script>
 
 <style lang="scss">
-.button-box {
-  padding: 10px 20px;
-  .el-button {
-    float: right;
-  }
-}
-
 .user-dialog {
   .header-img-box {
   width: 200px;
@@ -269,5 +342,15 @@ export default {
     height: 178px;
     display: block;
   }
+}
+.nickName{
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+}
+.pointer{
+  cursor: pointer;
+  font-size: 16px;
+  margin-left: 2px;
 }
 </style>

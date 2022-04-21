@@ -1,10 +1,10 @@
 package system
 
 import (
-	"gin-vue-admin/global"
-	"gin-vue-admin/model/common/request"
-	"gin-vue-admin/model/system"
-	systemReq "gin-vue-admin/model/system/request"
+	"github.com/flipped-aurora/gin-vue-admin/server/global"
+	"github.com/flipped-aurora/gin-vue-admin/server/model/common/request"
+	"github.com/flipped-aurora/gin-vue-admin/server/model/system"
+	systemReq "github.com/flipped-aurora/gin-vue-admin/server/model/system/request"
 )
 
 //@author: [granty1](https://github.com/granty1)
@@ -13,8 +13,7 @@ import (
 //@param: sysOperationRecord model.SysOperationRecord
 //@return: err error
 
-type OperationRecordService struct {
-}
+type OperationRecordService struct{}
 
 func (operationRecordService *OperationRecordService) CreateSysOperationRecord(sysOperationRecord system.SysOperationRecord) (err error) {
 	err = global.GVA_DB.Create(&sysOperationRecord).Error
@@ -79,6 +78,9 @@ func (operationRecordService *OperationRecordService) GetSysOperationRecordInfoL
 		db = db.Where("status = ?", info.Status)
 	}
 	err = db.Count(&total).Error
+	if err != nil {
+		return
+	}
 	err = db.Order("id desc").Limit(limit).Offset(offset).Preload("User").Find(&sysOperationRecords).Error
 	return err, sysOperationRecords, total
 }

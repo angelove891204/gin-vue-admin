@@ -1,12 +1,12 @@
 package autocode
 
 import (
-	"gin-vue-admin/global"
-    "gin-vue-admin/model/autocode"
-    "gin-vue-admin/model/common/request"
-    autocodeReq "gin-vue-admin/model/autocode/request"
-    "gin-vue-admin/model/common/response"
-    "gin-vue-admin/service"
+	"github.com/flipped-aurora/gin-vue-admin/server/global"
+    "github.com/flipped-aurora/gin-vue-admin/server/model/autocode"
+    "github.com/flipped-aurora/gin-vue-admin/server/model/common/request"
+    autocodeReq "github.com/flipped-aurora/gin-vue-admin/server/model/autocode/request"
+    "github.com/flipped-aurora/gin-vue-admin/server/model/common/response"
+    "github.com/flipped-aurora/gin-vue-admin/server/service"
     "github.com/gin-gonic/gin"
     "go.uber.org/zap"
 )
@@ -30,7 +30,7 @@ func ({{.Abbreviation}}Api *{{.StructName}}Api) Create{{.StructName}}(c *gin.Con
 	var {{.Abbreviation}} autocode.{{.StructName}}
 	_ = c.ShouldBindJSON(&{{.Abbreviation}})
 	if err := {{.Abbreviation}}Service.Create{{.StructName}}({{.Abbreviation}}); err != nil {
-        global.GVA_LOG.Error("创建失败!", zap.Any("err", err))
+        global.GVA_LOG.Error("创建失败!", zap.Error(err))
 		response.FailWithMessage("创建失败", c)
 	} else {
 		response.OkWithMessage("创建成功", c)
@@ -50,7 +50,7 @@ func ({{.Abbreviation}}Api *{{.StructName}}Api) Delete{{.StructName}}(c *gin.Con
 	var {{.Abbreviation}} autocode.{{.StructName}}
 	_ = c.ShouldBindJSON(&{{.Abbreviation}})
 	if err := {{.Abbreviation}}Service.Delete{{.StructName}}({{.Abbreviation}}); err != nil {
-        global.GVA_LOG.Error("删除失败!", zap.Any("err", err))
+        global.GVA_LOG.Error("删除失败!", zap.Error(err))
 		response.FailWithMessage("删除失败", c)
 	} else {
 		response.OkWithMessage("删除成功", c)
@@ -70,7 +70,7 @@ func ({{.Abbreviation}}Api *{{.StructName}}Api) Delete{{.StructName}}ByIds(c *gi
 	var IDS request.IdsReq
     _ = c.ShouldBindJSON(&IDS)
 	if err := {{.Abbreviation}}Service.Delete{{.StructName}}ByIds(IDS); err != nil {
-        global.GVA_LOG.Error("批量删除失败!", zap.Any("err", err))
+        global.GVA_LOG.Error("批量删除失败!", zap.Error(err))
 		response.FailWithMessage("批量删除失败", c)
 	} else {
 		response.OkWithMessage("批量删除成功", c)
@@ -90,7 +90,7 @@ func ({{.Abbreviation}}Api *{{.StructName}}Api) Update{{.StructName}}(c *gin.Con
 	var {{.Abbreviation}} autocode.{{.StructName}}
 	_ = c.ShouldBindJSON(&{{.Abbreviation}})
 	if err := {{.Abbreviation}}Service.Update{{.StructName}}({{.Abbreviation}}); err != nil {
-        global.GVA_LOG.Error("更新失败!", zap.Any("err", err))
+        global.GVA_LOG.Error("更新失败!", zap.Error(err))
 		response.FailWithMessage("更新失败", c)
 	} else {
 		response.OkWithMessage("更新成功", c)
@@ -103,14 +103,14 @@ func ({{.Abbreviation}}Api *{{.StructName}}Api) Update{{.StructName}}(c *gin.Con
 // @Security ApiKeyAuth
 // @accept application/json
 // @Produce application/json
-// @Param data body autocode.{{.StructName}} true "用id查询{{.StructName}}"
+// @Param data query autocode.{{.StructName}} true "用id查询{{.StructName}}"
 // @Success 200 {string} string "{"success":true,"data":{},"msg":"查询成功"}"
 // @Router /{{.Abbreviation}}/find{{.StructName}} [get]
 func ({{.Abbreviation}}Api *{{.StructName}}Api) Find{{.StructName}}(c *gin.Context) {
 	var {{.Abbreviation}} autocode.{{.StructName}}
 	_ = c.ShouldBindQuery(&{{.Abbreviation}})
 	if err, re{{.Abbreviation}} := {{.Abbreviation}}Service.Get{{.StructName}}({{.Abbreviation}}.ID); err != nil {
-        global.GVA_LOG.Error("查询失败!", zap.Any("err", err))
+        global.GVA_LOG.Error("查询失败!", zap.Error(err))
 		response.FailWithMessage("查询失败", c)
 	} else {
 		response.OkWithData(gin.H{"re{{.Abbreviation}}": re{{.Abbreviation}}}, c)
@@ -123,14 +123,14 @@ func ({{.Abbreviation}}Api *{{.StructName}}Api) Find{{.StructName}}(c *gin.Conte
 // @Security ApiKeyAuth
 // @accept application/json
 // @Produce application/json
-// @Param data body autocodeReq.{{.StructName}}Search true "分页获取{{.StructName}}列表"
+// @Param data query autocodeReq.{{.StructName}}Search true "分页获取{{.StructName}}列表"
 // @Success 200 {string} string "{"success":true,"data":{},"msg":"获取成功"}"
 // @Router /{{.Abbreviation}}/get{{.StructName}}List [get]
 func ({{.Abbreviation}}Api *{{.StructName}}Api) Get{{.StructName}}List(c *gin.Context) {
 	var pageInfo autocodeReq.{{.StructName}}Search
 	_ = c.ShouldBindQuery(&pageInfo)
 	if err, list, total := {{.Abbreviation}}Service.Get{{.StructName}}InfoList(pageInfo); err != nil {
-	    global.GVA_LOG.Error("获取失败!", zap.Any("err", err))
+	    global.GVA_LOG.Error("获取失败!", zap.Error(err))
         response.FailWithMessage("获取失败", c)
     } else {
         response.OkWithDetailed(response.PageResult{
