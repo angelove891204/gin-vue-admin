@@ -7,8 +7,8 @@
 </template>
 
 <script>
-import MenuItem from './menuItem.vue'
-import AsyncSubmenu from './asyncSubmenu.vue'
+import MenuItem from './menuItem'
+import AsyncSubmenu from './asyncSubmenu'
 
 export default {
   name: 'AsideComponent',

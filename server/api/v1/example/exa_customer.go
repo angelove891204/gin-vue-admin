@@ -1,17 +1,18 @@
 package example
 
 import (
-	"github.com/flipped-aurora/gin-vue-admin/server/global"
-	"github.com/flipped-aurora/gin-vue-admin/server/model/common/request"
-	"github.com/flipped-aurora/gin-vue-admin/server/model/common/response"
-	"github.com/flipped-aurora/gin-vue-admin/server/model/example"
-	exampleRes "github.com/flipped-aurora/gin-vue-admin/server/model/example/response"
-	"github.com/flipped-aurora/gin-vue-admin/server/utils"
+	"gin-vue-admin/global"
+	"gin-vue-admin/model/common/request"
+	"gin-vue-admin/model/common/response"
+	"gin-vue-admin/model/example"
+	exampleRes "gin-vue-admin/model/example/response"
+	"gin-vue-admin/utils"
 	"github.com/gin-gonic/gin"
 	"go.uber.org/zap"
 )
 
-type CustomerApi struct{}
+type CustomerApi struct {
+}
 
 // @Tags ExaCustomer
 // @Summary 创建客户
@@ -31,7 +32,7 @@ func (e *CustomerApi) CreateExaCustomer(c *gin.Context) {
 	customer.SysUserID = utils.GetUserID(c)
 	customer.SysUserAuthorityID = utils.GetUserAuthorityId(c)
 	if err := customerService.CreateExaCustomer(customer); err != nil {
-		global.GVA_LOG.Error("创建失败!", zap.Error(err))
+		global.GVA_LOG.Error("创建失败!", zap.Any("err", err))
 		response.FailWithMessage("创建失败", c)
 	} else {
 		response.OkWithMessage("创建成功", c)
@@ -54,7 +55,7 @@ func (e *CustomerApi) DeleteExaCustomer(c *gin.Context) {
 		return
 	}
 	if err := customerService.DeleteExaCustomer(customer); err != nil {
-		global.GVA_LOG.Error("删除失败!", zap.Error(err))
+		global.GVA_LOG.Error("删除失败!", zap.Any("err", err))
 		response.FailWithMessage("删除失败", c)
 	} else {
 		response.OkWithMessage("删除成功", c)
@@ -81,7 +82,7 @@ func (e *CustomerApi) UpdateExaCustomer(c *gin.Context) {
 		return
 	}
 	if err := customerService.UpdateExaCustomer(&customer); err != nil {
-		global.GVA_LOG.Error("更新失败!", zap.Error(err))
+		global.GVA_LOG.Error("更新失败!", zap.Any("err", err))
 		response.FailWithMessage("更新失败", c)
 	} else {
 		response.OkWithMessage("更新成功", c)
@@ -93,7 +94,7 @@ func (e *CustomerApi) UpdateExaCustomer(c *gin.Context) {
 // @Security ApiKeyAuth
 // @accept application/json
 // @Produce application/json
-// @Param data query example.ExaCustomer true "客户ID"
+// @Param data body example.ExaCustomer true "客户ID"
 // @Success 200 {string} string "{"success":true,"data":{},"msg":"获取成功"}"
 // @Router /customer/customer [get]
 func (e *CustomerApi) GetExaCustomer(c *gin.Context) {
@@ -105,7 +106,7 @@ func (e *CustomerApi) GetExaCustomer(c *gin.Context) {
 	}
 	err, data := customerService.GetExaCustomer(customer.ID)
 	if err != nil {
-		global.GVA_LOG.Error("获取失败!", zap.Error(err))
+		global.GVA_LOG.Error("获取失败!", zap.Any("err", err))
 		response.FailWithMessage("获取失败", c)
 	} else {
 		response.OkWithDetailed(exampleRes.ExaCustomerResponse{Customer: data}, "获取成功", c)
@@ -117,7 +118,7 @@ func (e *CustomerApi) GetExaCustomer(c *gin.Context) {
 // @Security ApiKeyAuth
 // @accept application/json
 // @Produce application/json
-// @Param data query request.PageInfo true "页码, 每页大小"
+// @Param data body request.PageInfo true "页码, 每页大小"
 // @Success 200 {string} string "{"success":true,"data":{},"msg":"获取成功"}"
 // @Router /customer/customerList [get]
 func (e *CustomerApi) GetExaCustomerList(c *gin.Context) {
@@ -129,7 +130,7 @@ func (e *CustomerApi) GetExaCustomerList(c *gin.Context) {
 	}
 	err, customerList, total := customerService.GetCustomerInfoList(utils.GetUserAuthorityId(c), pageInfo)
 	if err != nil {
-		global.GVA_LOG.Error("获取失败!", zap.Error(err))
+		global.GVA_LOG.Error("获取失败!", zap.Any("err", err))
 		response.FailWithMessage("获取失败"+err.Error(), c)
 	} else {
 		response.OkWithDetailed(response.PageResult{

@@ -3,16 +3,17 @@ package system
 type ServiceGroup struct {
 	JwtService
 	ApiService
-	MenuService
-	UserService
-	CasbinService
-	InitDBService
-	AutoCodeService
-	BaseMenuService
 	AuthorityService
-	DictionaryService
-	SystemConfigService
+	AutoCodeService
 	AutoCodeHistoryService
-	OperationRecordService
+	BaseMenuService
+	CasbinService
+	DictionaryService
 	DictionaryDetailService
+	EmailService
+	InitDBService
+	MenuService
+	OperationRecordService
+	SystemConfigService
+	UserService
 }

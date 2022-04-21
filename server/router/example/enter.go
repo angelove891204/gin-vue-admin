@@ -1,7 +1,8 @@
 package example
 
 type RouterGroup struct {
-	ExcelRouter
 	CustomerRouter
+	ExcelRouter
 	FileUploadAndDownloadRouter
+	SimpleUploaderRouter
 }

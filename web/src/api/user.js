@@ -141,10 +141,3 @@ export const getUserInfo = () => {
     method: 'get'
   })
 }
-
-export const resetPassword = () => {
-  return service({
-    url: '/user/resetPassword',
-    method: 'post'
-  })
-}

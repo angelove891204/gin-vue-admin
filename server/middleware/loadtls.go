@@ -2,7 +2,6 @@ package middleware
 
 import (
 	"fmt"
-
 	"github.com/gin-gonic/gin"
 	"github.com/unrolled/secure"
 )

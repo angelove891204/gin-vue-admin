@@ -11,10 +11,8 @@ import (
 // 前端发送每片多大
 // 前端告知是否为最后一片且是否完成
 
-const (
-	breakpointDir = "./breakpointDir/"
-	finishDir     = "./fileDir/"
-)
+const breakpointDir = "./breakpointDir/"
+const finishDir = "./fileDir/"
 
 //@author: [piexlmax](https://github.com/piexlmax)
 //@function: BreakPointContinue
@@ -30,6 +28,7 @@ func BreakPointContinue(content []byte, fileName string, contentNumber int, cont
 	}
 	err, pathc := makeFileContent(content, fileName, path, contentNumber)
 	return err, pathc
+
 }
 
 //@author: [piexlmax](https://github.com/piexlmax)
@@ -80,7 +79,7 @@ func MakeFile(fileName string, FileMd5 string) (error, string) {
 		return err, finishDir + fileName
 	}
 	_ = os.MkdirAll(finishDir, os.ModePerm)
-	fd, err := os.OpenFile(finishDir+fileName, os.O_RDWR|os.O_CREATE|os.O_APPEND, 0o644)
+	fd, err := os.OpenFile(finishDir+fileName, os.O_RDWR|os.O_CREATE|os.O_APPEND, 0644)
 	if err != nil {
 		return err, finishDir + fileName
 	}

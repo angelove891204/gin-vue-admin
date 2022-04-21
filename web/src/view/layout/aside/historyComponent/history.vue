@@ -2,9 +2,9 @@
   <div class="router-history">
     <el-tabs
       v-model="activeValue"
-      :closable="!(historys.length===1&&$route.name===defaultRouter)"
+      :closable="!(historys.length===1&&this.$route.name===defaultRouter)"
       type="card"
-      @contextmenu.prevent="openContextMenu($event)"
+      @contextmenu.prevent.native="openContextMenu($event)"
       @tab-click="changeTab"
       @tab-remove="removeTab"
     >
@@ -16,9 +16,7 @@
         :tab="item"
         class="gva-tab"
       >
-        <template #label>
-          <span :style="{color: activeValue===name(item)?activeColor:'#333'}"><i class="dot" :style="{ backgroundColor:activeValue===name(item)?activeColor:'#ddd'}" /> {{ item.meta.title }}</span>
-        </template>
+        <span slot="label" :style="{color: activeValue===name(item)?activeColor:'#333'}"><i class="dot" :style="{backgroundColor:activeValue===name(item)?activeColor:'#ddd'}" /> {{ item.meta.title }}</span>
       </el-tab-pane>
     </el-tabs>
 
@@ -34,8 +32,6 @@
 
 <script>
 import { mapGetters } from 'vuex'
-import { emitter } from '@/utils/bus.js'
-
 const getFmtString = (item) => {
   return item.name +
       JSON.stringify(item.query) +
@@ -74,31 +70,20 @@ export default {
       }
     },
     $route(to, now) {
-      if (to.name === 'Login') {
-        return
-      }
       this.historys = this.historys.filter(item => !item.meta.closeTab)
       this.setTab(to)
       sessionStorage.setItem('historys', JSON.stringify(this.historys))
       this.activeValue = window.sessionStorage.getItem('activeValue')
       if (now && to && now.name === to.name) {
-        emitter.emit('reload')
+        this.$bus.$emit('reload')
       }
     }
   },
   created() {
-    // 全局监听 关闭当前页面函数
-    emitter.on('closeThisPage', () => {
-      this.removeTab(this.name(this.$route))
-    })
-    // 全局监听 关闭所有页面函数
-    emitter.on('closeAllPage', () => {
-      this.closeAll()
-    })
-    emitter.on('mobile', isMobile => {
+    this.$bus.on('mobile', isMobile => {
       this.isMobile = isMobile
     })
-    emitter.on('collapse', isCollapse => {
+    this.$bus.on('collapse', isCollapse => {
       this.isCollapse = isCollapse
     })
     const initHistorys = [
@@ -120,9 +105,10 @@ export default {
     }
     this.setTab(this.$route)
   },
-  beforeUnmount() {
-    emitter.off('collapse')
-    emitter.off('mobile')
+
+  beforeDestroy() {
+    this.$bus.off('collapse')
+    this.$bus.off('mobile')
   },
   methods: {
     name(item) {
@@ -134,6 +120,7 @@ export default {
       }
       let id = ''
       if (e.srcElement.nodeName === 'SPAN') {
+        console.log(e)
         id = e.srcElement.offsetParent.id
       } else {
         id = e.srcElement.id
@@ -249,7 +236,7 @@ export default {
       )
     },
     changeTab(component) {
-      const tab = component.instance.attrs.tab
+      const tab = component.$attrs.tab
       this.$router.push({
         name: tab.name,
         query: tab.query,

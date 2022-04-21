@@ -2,6 +2,7 @@
 <template>
   <div>
     <el-upload
+      class="image-uploader"
       :action="`${path}/fileUploadAndDownload/upload`"
       :headers="{ 'x-token': token }"
       :show-file-list="false"
@@ -9,13 +10,14 @@
       :before-upload="beforeImageUpload"
       :multiple="false"
     >
-      <el-button size="mini" type="primary">压缩上传</el-button>
+      <img v-if="imageUrl" :src="showImageUrl" class="image">
+      <i v-else class="el-icon-plus image-uploader-icon" />
     </el-upload>
   </div>
 </template>
 
 <script>
-const path = import.meta.env.VITE_BASE_API
+const path = process.env.VUE_APP_BASE_API
 import { mapGetters } from 'vuex'
 import ImageCompress from '@/utils/image'
 export default {
@@ -51,13 +53,6 @@ export default {
   },
   methods: {
     beforeImageUpload(file) {
-      const isJPG = file.type === 'image/jpeg'
-      const isPng = file.type === 'image/png'
-      if (!isJPG && !isPng) {
-        this.$message.error('上传头像图片只能是 jpg或png 格式!')
-        return false
-      }
-
       const isRightSize = file.size / 1024 < this.fileSize
       if (!isRightSize) {
         // 压缩

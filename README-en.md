@@ -299,19 +299,11 @@ swag init
 
 #### [About Us](https://www.gin-vue-admin.com/about/)
 
-## 8. Contributors
-
-Thank you for considering your contribution to gin-vue-admin!
-
-<a href="https://github.com/flipped-aurora/gin-vue-admin/graphs/contributors">
-  <img src="https://contrib.rocks/image?repo=flipped-aurora/gin-vue-admin" />
-</a>
-
-## 9. Donate
+## 8. Donate
 
 If you find this project useful, you can buy author a glass of juice :tropical_drink: [here](https://www.gin-vue-admin.com/docs/coffee)
 
-## 10. Commercial considerations
+## 9. Commercial considerations
 
 If you use this project for commercial purposes, please comply with the Apache2.0 agreement and retain the author's technical support statement.
 

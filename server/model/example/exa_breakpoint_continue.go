@@ -1,15 +1,15 @@
 package example
 
 import (
-	"github.com/flipped-aurora/gin-vue-admin/server/global"
+	"gin-vue-admin/global"
 )
 
 // file struct, 文件结构体
 type ExaFile struct {
 	global.GVA_MODEL
-	FileName     string  `json:"fileName"`
-	FileMd5      string	 `json:"fileMd5"`
-	FilePath     string	 `json:"filePath"`
+	FileName     string
+	FileMd5      string
+	FilePath     string
 	ExaFileChunk []ExaFileChunk
 	ChunkTotal   int
 	IsFinish     bool

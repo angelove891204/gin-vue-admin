@@ -1,10 +1,10 @@
 package system
 
 import (
-	"github.com/flipped-aurora/gin-vue-admin/server/config"
-	"github.com/flipped-aurora/gin-vue-admin/server/global"
-	"github.com/flipped-aurora/gin-vue-admin/server/model/system"
-	"github.com/flipped-aurora/gin-vue-admin/server/utils"
+	"gin-vue-admin/config"
+	"gin-vue-admin/global"
+	"gin-vue-admin/model/system"
+	"gin-vue-admin/utils"
 	"go.uber.org/zap"
 )
 
@@ -13,7 +13,8 @@ import (
 //@description: 读取配置文件
 //@return: err error, conf config.Server
 
-type SystemConfigService struct{}
+type SystemConfigService struct {
+}
 
 func (systemConfigService *SystemConfigService) GetSystemConfig() (err error, conf config.Server) {
 	return nil, global.GVA_CONFIG

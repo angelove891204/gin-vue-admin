@@ -1,7 +1,7 @@
 <template>
   <el-container class="layout-cont">
     <el-container :class="[isSider?'openside':'hideside',isMobile ? 'mobile': '']">
-      <el-row :class="[isShadowBg?'shadowBg':'']" @click="changeShadow()" />
+      <el-row :class="[isShadowBg?'shadowBg':'']" @click.native="changeShadow()" />
       <el-aside class="main-cont main-left">
         <div class="tilte" :style="{background: backgroundColor}">
           <img alt class="logoimg" :src="$GIN_VUE_ADMIN.appLogo">
@@ -18,76 +18,67 @@
           >
             <el-row>
               <!-- :xs="8" :sm="6" :md="4" :lg="3" :xl="1" -->
-              <el-col>
-                <el-header class="header-cont">
-                  <el-row class="pd-0">
-                    <el-col :xs="2" :lg="1" :md="1" :sm="1" :xl="1" style="z-index:100">
-                      <div class="menu-total" @click="totalCollapse">
-                        <el-icon v-if="isCollapse" size="24"><expand /></el-icon>
-                        <el-icon v-else size="24">
-                          <fold />
-                        </el-icon>
-                      </div>
-                    </el-col>
-                    <el-col :xs="10" :lg="14" :md="14" :sm="9" :xl="14" :pull="1">
-                      <el-breadcrumb class="breadcrumb">
-                        <el-breadcrumb-item
-                          v-for="item in matched.slice(1,matched.length)"
-                          :key="item.path"
-                        >{{ item.meta.title }}</el-breadcrumb-item>
-                      </el-breadcrumb>
-                    </el-col>
-                    <el-col :xs="12" :lg="9" :md="9" :sm="14" :xl="9">
-                      <div class="right-box">
-                        <Search />
-                        <el-dropdown>
-                          <div class="dp-flex justify-content-center align-items height-full width-full">
-                            <span class="header-avatar" style="cursor: pointer">
-                              <CustomPic />
-                              <span style="margin-left: 5px">{{ userInfo.nickName }}</span>
-                              <el-icon>
-                                <arrow-down />
-                              </el-icon>
+              <el-header class="header-cont">
+                <el-col :xs="2" :lg="1" :md="1" :sm="1" :xl="1">
+                  <div class="menu-total" @click="totalCollapse">
+                    <i v-if="isCollapse" class="el-icon-s-unfold" />
+                    <i v-else class="el-icon-s-fold" />
+                  </div>
+                </el-col>
+                <el-col :xs="10" :lg="14" :md="14" :sm="9" :xl="14">
+                  <el-breadcrumb class="breadcrumb" separator-class="el-icon-arrow-right">
+                    <el-breadcrumb-item
+                      v-for="item in matched.slice(1,matched.length)"
+                      :key="item.path"
+                    >{{ item.meta.title }}</el-breadcrumb-item>
+                  </el-breadcrumb>
+                </el-col>
+                <el-col :xs="12" :lg="9" :md="9" :sm="14" :xl="9">
+                  <div class="fl-right right-box">
+                    <Search />
+                    <Screenfull class="screenfull" :style="{cursor:'pointer'}" />
+                    <el-dropdown>
+                      <span class="header-avatar" style="cursor: pointer">
+                        <CustomPic />
+                        <span style="margin-left: 5px">{{ userInfo.nickName }}</span>
+                        <i class="el-icon-arrow-down" />
+                      </span>
+                      <el-dropdown-menu slot="dropdown" class="dropdown-group">
+                        <el-dropdown-item>
+                          <span style="font-weight: 600;">
+                            当前角色：{{ userInfo.authority.authorityName }}
+                          </span>
+                        </el-dropdown-item>
+                        <template v-if="userInfo.authorities">
+                          <el-dropdown-item v-for="item in userInfo.authorities.filter(i=>i.authorityId!==userInfo.authorityId)" :key="item.authorityId" @click.native="changeUserAuth(item.authorityId)">
+                            <span>
+                              切换为：{{ item.authorityName }}
                             </span>
-                          </div>
-                          <template #dropdown>
-                            <el-dropdown-menu class="dropdown-group">
-                              <el-dropdown-item>
-                                <span style="font-weight: 600;">
-                                  当前角色：{{ userInfo.authority.authorityName }}
-                                </span>
-                              </el-dropdown-item>
-                              <template v-if="userInfo.authorities">
-                                <el-dropdown-item v-for="item in userInfo.authorities.filter(i=>i.authorityId!==userInfo.authorityId)" :key="item.authorityId" @click="changeUserAuth(item.authorityId)">
-                                  <span>
-                                    切换为：{{ item.authorityName }}
-                                  </span>
-                                </el-dropdown-item>
-                              </template>
-                              <el-dropdown-item icon="avatar" @click="toPerson">个人信息</el-dropdown-item>
-                              <el-dropdown-item icon="reading-lamp" @click="LoginOut">登 出</el-dropdown-item>
-                            </el-dropdown-menu>
-                          </template>
-                        </el-dropdown>
-                      </div>
-                    </el-col>
-                  </el-row>
-                </el-header>
-              </el-col>
+                          </el-dropdown-item>
+                        </template>
+                        <el-dropdown-item icon="el-icon-s-custom" @click.native="toPerson">个人信息</el-dropdown-item>
+                        <el-dropdown-item icon="el-icon-table-lamp" @click.native="LoginOut">登 出</el-dropdown-item>
+                      </el-dropdown-menu>
+                    </el-dropdown>
+                  </div>
+                </el-col>
+
+              </el-header>
             </el-row>
             <!-- 当前面包屑用路由自动生成可根据需求修改 -->
             <!--
             :to="{ path: item.path }" 暂时注释不用-->
-            <HistoryComponent ref="layoutHistoryComponent" />
+            <HistoryComponent />
           </div>
         </transition>
-        <router-view v-if="reloadFlag" v-slot="{ Component }" v-loading="loadingFlag" element-loading-text="正在加载中" class="admin-box">
-          <transition mode="out-in" name="el-fade-in-linear">
-            <keep-alive :include="$store.getters['router/keepAliveRouters']">
-              <component :is="Component" />
-            </keep-alive>
-          </transition>
-        </router-view>
+        <transition mode="out-in" name="el-fade-in-linear">
+          <keep-alive>
+            <router-view v-if="$route.meta.keepAlive && reloadFlag" v-loading="loadingFlag" element-loading-text="正在加载中" class="admin-box" />
+          </keep-alive>
+        </transition>
+        <transition mode="out-in" name="el-fade-in-linear">
+          <router-view v-if="!$route.meta.keepAlive && reloadFlag" v-loading="loadingFlag" element-loading-text="正在加载中" class="admin-box" />
+        </transition>
         <BottomInfo />
         <setting />
       </el-main>
@@ -97,20 +88,21 @@
 </template>
 
 <script>
-import Aside from '@/view/layout/aside/index.vue'
-import HistoryComponent from '@/view/layout/aside/historyComponent/history.vue'
-import Search from '@/view/layout/search/search.vue'
-import BottomInfo from '@/view/layout/bottomInfo/bottomInfo.vue'
+import Aside from '@/view/layout/aside'
+import HistoryComponent from '@/view/layout/aside/historyComponent/history'
+import Screenfull from '@/view/layout/screenfull'
+import Search from '@/view/layout/search/search'
+import BottomInfo from '@/view/layout/bottomInfo/bottomInfo'
 import { mapGetters, mapActions } from 'vuex'
-import CustomPic from '@/components/customPic/index.vue'
-import Setting from './setting/index.vue'
+import CustomPic from '@/components/customPic'
+import Setting from './setting'
 import { setUserAuthority } from '@/api/user'
-import { emitter } from '@/utils/bus.js'
 export default {
   name: 'Layout',
   components: {
     Aside,
     HistoryComponent,
+    Screenfull,
     Search,
     BottomInfo,
     CustomPic,
@@ -155,7 +147,7 @@ export default {
       return this.$route.matched
     }
   },
-  created() {
+  mounted() {
     const screenWidth = document.body.clientWidth
     if (screenWidth < 1000) {
       this.isMobile = true
@@ -170,15 +162,13 @@ export default {
       this.isSider = true
       this.isCollapse = false
     }
-  },
-  mounted() {
-    emitter.emit('collapse', this.isCollapse)
-    emitter.emit('mobile', this.isMobile)
-    emitter.on('reload', this.reload)
-    emitter.on('showLoading', () => {
+    this.$bus.emit('collapse', this.isCollapse)
+    this.$bus.emit('mobile', this.isMobile)
+    this.$bus.on('reload', this.reload)
+    this.$bus.on('showLoading', () => {
       this.loadingFlag = true
     })
-    emitter.on('closeLoading', () => {
+    this.$bus.on('closeLoading', () => {
       this.loadingFlag = false
     })
     window.onresize = () => {
@@ -197,8 +187,8 @@ export default {
           this.isSider = true
           this.isCollapse = false
         }
-        emitter.emit('collapse', this.isCollapse)
-        emitter.emit('mobile', this.isMobile)
+        this.$bus.emit('collapse', this.isCollapse)
+        this.$bus.emit('mobile', this.isMobile)
       })()
     }
   },
@@ -209,10 +199,7 @@ export default {
         authorityId: id
       })
       if (res.code === 0) {
-        emitter.emit('closeAllPage')
-        setTimeout(() => {
-          window.location.reload()
-        }, 1)
+        window.location.reload()
       }
     },
     reload() {
@@ -225,7 +212,7 @@ export default {
       this.isCollapse = !this.isCollapse
       this.isSider = !this.isCollapse
       this.isShadowBg = !this.isCollapse
-      emitter.emit('collapse', this.isCollapse)
+      this.$bus.emit('collapse', this.isCollapse)
     },
     toPerson() {
       this.$router.push({ name: 'person' })

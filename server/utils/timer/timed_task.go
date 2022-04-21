@@ -62,6 +62,7 @@ func (t *timer) StartTask(taskName string) {
 	if v, ok := t.taskList[taskName]; ok {
 		v.Start()
 	}
+	return
 }
 
 // StopTask 停止任务
@@ -71,6 +72,7 @@ func (t *timer) StopTask(taskName string) {
 	if v, ok := t.taskList[taskName]; ok {
 		v.Stop()
 	}
+	return
 }
 
 // Remove 从taskName 删除指定任务
@@ -80,6 +82,7 @@ func (t *timer) Remove(taskName string, id int) {
 	if v, ok := t.taskList[taskName]; ok {
 		v.Remove(cron.EntryID(id))
 	}
+	return
 }
 
 // Clear 清除任务

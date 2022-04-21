@@ -1,10 +1,9 @@
 package utils
 
 import (
-	"os"
-
-	"github.com/flipped-aurora/gin-vue-admin/server/global"
+	"gin-vue-admin/global"
 	"go.uber.org/zap"
+	"os"
 )
 
 //@author: [piexlmax](https://github.com/piexlmax)

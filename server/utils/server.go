@@ -1,12 +1,11 @@
 package utils
 
 import (
-	"runtime"
-	"time"
-
 	"github.com/shirou/gopsutil/cpu"
 	"github.com/shirou/gopsutil/disk"
 	"github.com/shirou/gopsutil/mem"
+	"runtime"
+	"time"
 )
 
 const (

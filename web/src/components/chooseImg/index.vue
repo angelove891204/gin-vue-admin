@@ -1,25 +1,23 @@
 <template>
-  <el-drawer v-model="drawer" title="媒体库">
+  <el-drawer title="媒体库" :visible.sync="drawer">
     <div class="media">
       <el-image
         v-for="(item,key) in picList"
         :key="key"
         class="header-img-box-list"
         :src="(item.url && item.url.slice(0, 4) !== 'http')?path+item.url:item.url"
-        @click="chooseImg(item.url,target,targetKey)"
+        @click.native="chooseImg(item.url,target,targetKey)"
       >
-        <template #error>
-          <div class="header-img-box-list">
-            <el-icon><picture /></el-icon>
-          </div>
-        </template>
+        <div slot="error" class="header-img-box-list">
+          <i class="el-icon-picture-outline" />
+        </div>
       </el-image>
     </div>
   </el-drawer>
 </template>
 
 <script>
-const path = import.meta.env.VITE_BASE_API
+const path = process.env.VUE_APP_BASE_API
 import { getFileList } from '@/api/fileUploadAndDownload'
 export default {
   props: {

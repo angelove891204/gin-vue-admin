@@ -1,15 +1,15 @@
 package example
 
-import "github.com/flipped-aurora/gin-vue-admin/server/service"
+import "gin-vue-admin/service"
 
 type ApiGroup struct {
-	ExcelApi
 	CustomerApi
+	ExcelApi
 	FileUploadAndDownloadApi
+	SimpleUploaderApi
 }
 
-var (
-	excelService                 = service.ServiceGroupApp.ExampleServiceGroup.ExcelService
-	customerService              = service.ServiceGroupApp.ExampleServiceGroup.CustomerService
-	fileUploadAndDownloadService = service.ServiceGroupApp.ExampleServiceGroup.FileUploadAndDownloadService
-)
+var fileUploadAndDownloadService = service.ServiceGroupApp.ExampleServiceGroup.FileUploadAndDownloadService
+var customerService = service.ServiceGroupApp.ExampleServiceGroup.CustomerService
+var excelService = service.ServiceGroupApp.ExampleServiceGroup.ExcelService
+var simpleUploaderService = service.ServiceGroupApp.ExampleServiceGroup.SimpleUploaderService

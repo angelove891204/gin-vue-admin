@@ -1,14 +1,14 @@
 package request
 
 import (
-	"github.com/flipped-aurora/gin-vue-admin/server/global"
-	"github.com/flipped-aurora/gin-vue-admin/server/model/system"
+	"gin-vue-admin/global"
+	"gin-vue-admin/model/system"
 )
 
 // Add menu authority info structure
 type AddMenuAuthorityInfo struct {
-	Menus       []system.SysBaseMenu `json:"menus"`
-	AuthorityId string               `json:"authorityId"` // 角色ID
+	Menus       []system.SysBaseMenu
+	AuthorityId string // 角色ID
 }
 
 func DefaultMenu() []system.SysBaseMenu {

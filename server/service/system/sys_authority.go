@@ -2,13 +2,12 @@ package system
 
 import (
 	"errors"
-	"strconv"
-
-	"github.com/flipped-aurora/gin-vue-admin/server/global"
-	"github.com/flipped-aurora/gin-vue-admin/server/model/common/request"
-	"github.com/flipped-aurora/gin-vue-admin/server/model/system"
-	"github.com/flipped-aurora/gin-vue-admin/server/model/system/response"
+	"gin-vue-admin/global"
+	"gin-vue-admin/model/common/request"
+	"gin-vue-admin/model/system"
+	"gin-vue-admin/model/system/response"
 	"gorm.io/gorm"
+	"strconv"
 )
 
 //@author: [piexlmax](https://github.com/piexlmax)
@@ -17,7 +16,8 @@ import (
 //@param: auth model.SysAuthority
 //@return: err error, authority model.SysAuthority
 
-type AuthorityService struct{}
+type AuthorityService struct {
+}
 
 var AuthorityServiceApp = new(AuthorityService)
 
@@ -43,9 +43,6 @@ func (authorityService *AuthorityService) CopyAuthority(copyInfo response.SysAut
 	}
 	copyInfo.Authority.Children = []system.SysAuthority{}
 	err, menus := MenuServiceApp.GetMenuAuthority(&request.GetAuthorityId{AuthorityId: copyInfo.OldAuthorityId})
-	if err != nil {
-		return
-	}
 	var baseMenu []system.SysBaseMenu
 	for _, v := range menus {
 		intNum, _ := strconv.Atoi(v.MenuId)
@@ -54,9 +51,7 @@ func (authorityService *AuthorityService) CopyAuthority(copyInfo response.SysAut
 	}
 	copyInfo.Authority.SysBaseMenus = baseMenu
 	err = global.GVA_DB.Create(&copyInfo.Authority).Error
-	if err != nil {
-		return
-	}
+
 	paths := CasbinServiceApp.GetPolicyPathByAuthorityId(copyInfo.OldAuthorityId)
 	err = CasbinServiceApp.UpdateCasbin(copyInfo.Authority.AuthorityId, paths)
 	if err != nil {
@@ -91,20 +86,11 @@ func (authorityService *AuthorityService) DeleteAuthority(auth *system.SysAuthor
 	}
 	db := global.GVA_DB.Preload("SysBaseMenus").Where("authority_id = ?", auth.AuthorityId).First(auth)
 	err = db.Unscoped().Delete(auth).Error
-	if err != nil {
-		return
-	}
 	if len(auth.SysBaseMenus) > 0 {
 		err = global.GVA_DB.Model(auth).Association("SysBaseMenus").Delete(auth.SysBaseMenus)
-		if err != nil {
-			return
-		}
-		// err = db.Association("SysBaseMenus").Delete(&auth)
+		//err = db.Association("SysBaseMenus").Delete(&auth)
 	} else {
 		err = db.Error
-		if err != nil {
-			return
-		}
 	}
 	err = global.GVA_DB.Delete(&[]system.SysUseAuthority{}, "sys_authority_authority_id = ?", auth.AuthorityId).Error
 	CasbinServiceApp.ClearCasbin(0, auth.AuthorityId)
@@ -120,10 +106,9 @@ func (authorityService *AuthorityService) DeleteAuthority(auth *system.SysAuthor
 func (authorityService *AuthorityService) GetAuthorityInfoList(info request.PageInfo) (err error, list interface{}, total int64) {
 	limit := info.PageSize
 	offset := info.PageSize * (info.Page - 1)
-	db := global.GVA_DB.Model(&system.SysAuthority{})
-	err = db.Where("parent_id = ?", "0").Count(&total).Error
+	db := global.GVA_DB
 	var authority []system.SysAuthority
-	err = db.Limit(limit).Offset(offset).Preload("DataAuthorityId").Where("parent_id = ?", "0").Find(&authority).Error
+	err = db.Limit(limit).Offset(offset).Preload("DataAuthorityId").Where("parent_id = 0").Find(&authority).Error
 	if len(authority) > 0 {
 		for k := range authority {
 			err = authorityService.findChildrenAuthority(&authority[k])

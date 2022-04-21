@@ -1,14 +1,15 @@
 package system
 
 import (
-	"github.com/flipped-aurora/gin-vue-admin/server/global"
-	"github.com/flipped-aurora/gin-vue-admin/server/model/common/response"
-	"github.com/flipped-aurora/gin-vue-admin/server/model/system"
+	"gin-vue-admin/global"
+	"gin-vue-admin/model/common/response"
+	"gin-vue-admin/model/system"
 	"github.com/gin-gonic/gin"
 	"go.uber.org/zap"
 )
 
-type JwtApi struct{}
+type JwtApi struct {
+}
 
 // @Tags Jwt
 // @Summary jwt加入黑名单
@@ -21,7 +22,7 @@ func (j *JwtApi) JsonInBlacklist(c *gin.Context) {
 	token := c.Request.Header.Get("x-token")
 	jwt := system.JwtBlacklist{Jwt: token}
 	if err := jwtService.JsonInBlacklist(jwt); err != nil {
-		global.GVA_LOG.Error("jwt作废失败!", zap.Error(err))
+		global.GVA_LOG.Error("jwt作废失败!", zap.Any("err", err))
 		response.FailWithMessage("jwt作废失败", c)
 	} else {
 		response.OkWithMessage("jwt作废成功", c)

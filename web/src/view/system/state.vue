@@ -3,9 +3,7 @@
     <el-row :gutter="15" class="system_state">
       <el-col :span="12">
         <el-card v-if="state.os" class="card_item">
-          <template #header>
-            <div>Runtime</div>
-          </template>
+          <div slot="header">Runtime</div>
           <div>
             <el-row :gutter="10">
               <el-col :span="12">os:</el-col>
@@ -32,9 +30,7 @@
       </el-col>
       <el-col :span="12">
         <el-card v-if="state.disk" class="card_item">
-          <template #header>
-            <div>Disk</div>
-          </template>
+          <div slot="header">Disk</div>
           <div>
             <el-row :gutter="10">
               <el-col :span="12">
@@ -74,32 +70,30 @@
           class="card_item"
           :body-style="{ height: '180px', 'overflow-y': 'scroll' }"
         >
-          <template #header>
-            <div>CPU</div>
-          </template>
+          <div slot="header">CPU</div>
           <div>
             <el-row :gutter="10">
               <el-col :span="12">physical number of cores:</el-col>
               <el-col :span="12" v-text="state.cpu.cores" />
             </el-row>
-            <el-row v-for="(item, index) in state.cpu.cpus" :key="index" :gutter="10">
-              <el-col :span="12">core {{ index }}:</el-col>
-              <el-col
-                :span="12"
-              ><el-progress
-                type="line"
-                :percentage="+item.toFixed(0)"
-                :color="colors"
-              /></el-col>
-            </el-row>
+            <template v-for="(item, index) in state.cpu.cpus">
+              <el-row :key="index" :gutter="10">
+                <el-col :span="12">core {{ index }}:</el-col>
+                <el-col
+                  :span="12"
+                ><el-progress
+                  type="line"
+                  :percentage="+item.toFixed(0)"
+                  :color="colors"
+                /></el-col>
+              </el-row>
+            </template>
           </div>
         </el-card>
       </el-col>
       <el-col :span="12">
         <el-card v-if="state.ram" class="card_item">
-          <template #header>
-            <div>Ram</div>
-          </template>
+          <div slot="header">Ram</div>
           <div>
             <el-row :gutter="10">
               <el-col :span="12">
@@ -159,7 +153,7 @@ export default {
       this.reload()
     }, 1000 * 10)
   },
-  beforeUnmount() {
+  beforeDestroy() {
     clearInterval(this.timer)
     this.timer = null
   },

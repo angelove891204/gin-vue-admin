@@ -6,56 +6,29 @@
           <div class="user-card">
             <div class="user-headpic-update" :style="{ 'background-image': `url(${(userInfo.headerImg && userInfo.headerImg.slice(0, 4) !== 'http')?path+userInfo.headerImg:userInfo.headerImg})`,'background-repeat':'no-repeat','background-size':'cover' }">
               <span class="update" @click="openChooseImg">
-                <el-icon>
-                  <edit />
-                </el-icon>
+                <i class="el-icon-edit" />
                 重新上传</span>
             </div>
             <div class="user-personality">
-              <p v-if="!editFlag" class="nickName">{{ userInfo.nickName }}
-                <el-icon class="pointer" color="#66b1ff" @click="openEidt">
-                  <edit />
-                </el-icon>
-              </p>
-              <p v-if="editFlag" class="nickName">
-                <el-input v-model="nickName" />
-                <el-icon class="pointer" color="#67c23a" @click="enterEdit">
-                  <check />
-                </el-icon>
-                <el-icon class="pointer" color="#f23c3c" @click="closeEdit">
-                  <close />
-                </el-icon>
-              </p>
+              <p class="nickname">{{ userInfo.nickName }}</p>
               <p class="person-info">这个家伙很懒，什么都没有留下</p>
             </div>
             <div class="user-information">
               <ul>
                 <li>
-                  <el-icon>
-                    <user />
-                  </el-icon>
-                  {{ userInfo.nickName }}
+                  <i class="el-icon-user" />{{ userInfo.nickName }}
                 </li>
                 <el-tooltip class="item" effect="light" content="北京反转极光科技有限公司-技术部-前端事业群" placement="top">
                   <li>
-                    <el-icon>
-                      <data-analysis />
-                    </el-icon>
-                    北京反转极光科技有限公司-技术部-前端事业群
+                    <i class="el-icon-data-analysis" />北京反转极光科技有限公司-技术部-前端事业群
                   </li>
                 </el-tooltip>
                 <li>
-                  <el-icon>
-                    <video-camera />
-                  </el-icon>
-                  中国·北京市·朝阳区
+                  <i class="el-icon-video-camera-solid" />中国·北京市·朝阳区
                 </li>
-                <el-tooltip class="item" effect="light" content="GoLang/JavaScript/Vue/Gorm" placement="top">
+                <el-tooltip class="item" effect="light" content="goLang/JavaScript/Vue/Gorm" placement="top">
                   <li>
-                    <el-icon>
-                      <medal />
-                    </el-icon>
-                    GoLang/JavaScript/Vue/Gorm
+                    <i class="el-icon-medal-1" />goLang/JavaScript/Vue/Gorm
                   </li>
                 </el-tooltip>
 
@@ -73,28 +46,28 @@
                   <p class="title">密保手机</p>
                   <p class="desc">
                     已绑定手机:1245678910
-                    <a href="javascript:void(0)">立即修改</a>
+                    <a href="#">立即修改</a>
                   </p>
                 </li>
                 <li>
                   <p class="title">密保邮箱</p>
                   <p class="desc">
                     已绑定邮箱：gin-vue-admin@google.com.cn
-                    <a href="javascript:void(0)">立即修改</a>
+                    <a href="#">立即修改</a>
                   </p>
                 </li>
                 <li>
                   <p class="title">密保问题</p>
                   <p class="desc">
                     未设置密保问题
-                    <a href="javascript:void(0)">去设置</a>
+                    <a href="#">去设置</a>
                   </p>
                 </li>
                 <li>
                   <p class="title">修改密码</p>
                   <p class="desc">
                     修改个人密码
-                    <a href="javascript:void(0)" @click="showPassword=true">修改密码</a>
+                    <a href="#" @click="showPassword=true">修改密码</a>
                   </p>
                 </li>
               </ul>
@@ -106,7 +79,7 @@
 
     <ChooseImg ref="chooseImg" @enter-img="enterImg" />
 
-    <el-dialog v-model="showPassword" title="修改密码" width="360px" @close="clearPassword">
+    <el-dialog :visible.sync="showPassword" title="修改密码" width="360px" @close="clearPassword">
       <el-form ref="modifyPwdForm" :model="pwdModify" :rules="rules" label-width="80px">
         <el-form-item :minlength="6" label="原密码" prop="password">
           <el-input v-model="pwdModify.password" show-password />
@@ -118,22 +91,20 @@
           <el-input v-model="pwdModify.confirmPassword" show-password />
         </el-form-item>
       </el-form>
-      <template #footer>
-        <div class="dialog-footer">
-          <el-button size="small" @click="showPassword=false">取 消</el-button>
-          <el-button size="small" type="primary" @click="savePassword">确 定</el-button>
-        </div>
-      </template>
+      <div slot="footer" class="dialog-footer">
+        <el-button @click="showPassword=false">取 消</el-button>
+        <el-button type="primary" @click="savePassword">确 定</el-button>
+      </div>
     </el-dialog>
   </div>
 </template>
 
 <script>
-import ChooseImg from '@/components/chooseImg/index.vue'
-import { setUserInfo, changePassword } from '@/api/user.js'
+import ChooseImg from '@/components/chooseImg'
+import { setUserInfo, changePassword } from '@/api/user'
 
 import { mapGetters, mapMutations } from 'vuex'
-const path = import.meta.env.VITE_BASE_API
+const path = process.env.VUE_APP_BASE_API
 export default {
   name: 'Person',
   components: {
@@ -145,8 +116,6 @@ export default {
       activeName: 'second',
       showPassword: false,
       pwdModify: {},
-      nickName: '',
-      editFlag: false,
       rules: {
         password: [
           { required: true, message: '请输入密码', trigger: 'blur' },
@@ -217,26 +186,6 @@ export default {
         })
       }
     },
-    openEidt() {
-      this.nickName = this.userInfo.nickName
-      this.editFlag = true
-    },
-    closeEdit() {
-      this.nickName = ''
-      this.editFlag = false
-    },
-    async enterEdit() {
-      const res = await setUserInfo({ nickName: this.nickName, ID: this.userInfo.ID })
-      if (res.code === 0) {
-        this.ResetUserInfo({ nickName: this.nickName })
-        this.$message({
-          type: 'success',
-          message: '设置成功'
-        })
-      }
-      this.nickName = ''
-      this.editFlag = false
-    },
     handleClick(tab, event) {
       console.log(tab, event)
     }
@@ -285,10 +234,7 @@ export default {
       p {
         font-size: 16px;
       }
-      .nickName {
-        display: flex;
-        justify-content: center;
-        align-items: center;
+      .nickname {
         font-size: 26px;
       }
       .person-info{
@@ -365,8 +311,5 @@ export default {
       text-align: center;
       color:transparent;
     }
-  }
-  .pointer{
-    cursor: pointer;
   }
 </style>

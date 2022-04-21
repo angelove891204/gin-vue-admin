@@ -1,11 +1,7 @@
 <template>
   <el-menu-item :index="routerInfo.name" :route="{parameters:routerInfo.parameters}">
-    <el-icon>
-      <component :is="routerInfo.meta.icon" />
-    </el-icon>
-    <template #title>
-      <span class="gva-menu-item-title">{{ routerInfo.meta.title }}</span>
-    </template>
+    <i :class="'el-icon-'+routerInfo.meta.icon" />
+    <span slot="title">{{ routerInfo.meta.title }}</span>
   </el-menu-item>
 </template>
 
@@ -22,8 +18,3 @@ export default {
   }
 }
 </script>
-<style lang="scss" scoped>
-// .gva-menu-item-title {
-//   min-width: 160px;
-// }
-</style>

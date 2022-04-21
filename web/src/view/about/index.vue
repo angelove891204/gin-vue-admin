@@ -3,9 +3,7 @@
     <el-row :gutter="10">
       <el-col :span="12">
         <el-card>
-          <template #header>
-            <el-divider>gin-vue-admin</el-divider>
-          </template>
+          <div slot="header">gin-vue-admin</div>
           <div>
             <el-row>
               <el-col :span="8" :offset="8">
@@ -50,9 +48,7 @@
           </div>
         </el-card>
         <el-card style="margin-top: 20px">
-          <template #header>
-            <div>flipped-aurora团队</div>
-          </template>
+          <div slot="header">flipped-aurora团队</div>
           <div>
             <el-row>
               <el-col :span="8" :offset="8">
@@ -66,35 +62,33 @@
               </el-col>
             </el-row>
             <el-row style="margin-left: 40px" :gutter="20">
-              <el-col v-for="(item, index) in members" :key="index" :span="8">
-                <a :href="item.html_url">
-                  <img class="avatar-img" :src="item.avatar_url">
-                  <a class="author-name" style="">{{ item.login }}</a>
-                </a>
-              </el-col>
+              <template v-for="(item, index) in members">
+                <el-col :key="index" :span="8">
+                  <a :href="item.html_url">
+                    <img class="avatar-img" :src="item.avatar_url">
+                    <a class="author-name" style="">{{ item.login }}</a>
+                  </a>
+                </el-col>
+              </template>
             </el-row>
           </div>
         </el-card>
       </el-col>
       <el-col :span="12">
         <el-card>
-          <template #header>
-            <div>提交记录</div>
-          </template>
+          <div slot="header">
+            提交记录
+          </div>
           <div>
-            <el-timeline>
-              <el-timeline-item
-                v-for="(item,index) in dataTimeline"
-                :key="index"
-                timestamp="2018/4/12"
-                placement="top"
-              >
-                <el-card>
-                  <h4>{{ item.title }}</h4>
-                  <p>{{ item.message }}</p>
-                </el-card>
-              </el-timeline-item>
-            </el-timeline>
+            <Timeline
+              :timeline-items="dataTimeline"
+              :message-when-no-items="messageWhenNoItems"
+              :unique-timeline="true"
+              :unique-year="true"
+              :show-day-and-month="true"
+              order="desc"
+              date-locale="zh-CN"
+            />
           </div>
           <el-button
             class="load-more"
@@ -109,14 +103,18 @@
 
 <script>
 import { Commits, Members } from '@/api/github'
+import Timeline from 'timeline-vuejs'
 export default {
   name: 'About',
+  components: {
+    Timeline
+  },
   data() {
     return {
       messageWhenNoItems: 'There arent commits',
       members: [],
       dataTimeline: [],
-      page: 0,
+      page: 0
     }
   },
   created() {
@@ -136,7 +134,7 @@ export default {
               from: new Date(element.commit.author.date),
               title: element.commit.author.name,
               showDayAndMonth: true,
-              message: element.commit.message,
+              description: `<a style="color: #26191b" href="${element.html_url}">${element.commit.message}</a>`
             })
           }
         })
@@ -147,8 +145,8 @@ export default {
         this.members = data
         this.members.sort()
       })
-    },
-  },
+    }
+  }
 }
 </script>
 

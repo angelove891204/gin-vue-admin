@@ -1,13 +1,11 @@
 <template>
-  <el-sub-menu ref="subMenu" :index="routerInfo.name">
-    <template #title>
-      <el-icon>
-        <component :is="routerInfo.meta.icon" />
-      </el-icon>
-      <span>{{ routerInfo.meta.title }}</span>
+  <el-submenu ref="subMenu" :popper-append-to-body="false" :index="routerInfo.name">
+    <template slot="title">
+      <i :class="'el-icon-'+routerInfo.meta.icon" />
+      <span slot="title">{{ routerInfo.meta.title }}</span>
     </template>
     <slot />
-  </el-sub-menu>
+  </el-submenu>
 </template>
 
 <script>

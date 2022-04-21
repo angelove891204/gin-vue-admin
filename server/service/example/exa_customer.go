@@ -1,14 +1,15 @@
 package example
 
 import (
-	"github.com/flipped-aurora/gin-vue-admin/server/global"
-	"github.com/flipped-aurora/gin-vue-admin/server/model/common/request"
-	"github.com/flipped-aurora/gin-vue-admin/server/model/example"
-	"github.com/flipped-aurora/gin-vue-admin/server/model/system"
-	systemService "github.com/flipped-aurora/gin-vue-admin/server/service/system"
+	"gin-vue-admin/global"
+	"gin-vue-admin/model/common/request"
+	"gin-vue-admin/model/example"
+	"gin-vue-admin/model/system"
+	systemService "gin-vue-admin/service/system"
 )
 
-type CustomerService struct{}
+type CustomerService struct {
+}
 
 //@author: [piexlmax](https://github.com/piexlmax)
 //@function: CreateExaCustomer
@@ -67,9 +68,6 @@ func (exa *CustomerService) GetCustomerInfoList(sysUserAuthorityID string, info 
 	var a system.SysAuthority
 	a.AuthorityId = sysUserAuthorityID
 	err, auth := systemService.AuthorityServiceApp.GetAuthorityInfo(a)
-	if err != nil {
-		return
-	}
 	var dataId []string
 	for _, v := range auth.DataAuthorityId {
 		dataId = append(dataId, v.AuthorityId)

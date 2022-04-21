@@ -1,9 +1,9 @@
 package system
 
 import (
-	"github.com/flipped-aurora/gin-vue-admin/server/global"
-	"github.com/flipped-aurora/gin-vue-admin/server/model/system"
-	"github.com/flipped-aurora/gin-vue-admin/server/model/system/request"
+	"gin-vue-admin/global"
+	"gin-vue-admin/model/system"
+	"gin-vue-admin/model/system/request"
 )
 
 //@author: [piexlmax](https://github.com/piexlmax)
@@ -12,7 +12,8 @@ import (
 //@param: sysDictionaryDetail model.SysDictionaryDetail
 //@return: err error
 
-type DictionaryDetailService struct{}
+type DictionaryDetailService struct {
+}
 
 func (dictionaryDetailService *DictionaryDetailService) CreateSysDictionaryDetail(sysDictionaryDetail system.SysDictionaryDetail) (err error) {
 	err = global.GVA_DB.Create(&sysDictionaryDetail).Error
@@ -78,9 +79,6 @@ func (dictionaryDetailService *DictionaryDetailService) GetSysDictionaryDetailIn
 		db = db.Where("sys_dictionary_id = ?", info.SysDictionaryID)
 	}
 	err = db.Count(&total).Error
-	if err != nil {
-		return
-	}
 	err = db.Limit(limit).Offset(offset).Find(&sysDictionaryDetails).Error
 	return err, sysDictionaryDetails, total
 }

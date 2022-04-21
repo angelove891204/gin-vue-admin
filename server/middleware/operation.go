@@ -2,18 +2,16 @@ package middleware
 
 import (
 	"bytes"
+	"gin-vue-admin/global"
+	"gin-vue-admin/model/system"
+	"gin-vue-admin/model/system/request"
+	"gin-vue-admin/service"
+	"github.com/gin-gonic/gin"
+	"go.uber.org/zap"
 	"io/ioutil"
 	"net/http"
 	"strconv"
 	"time"
-
-	"github.com/flipped-aurora/gin-vue-admin/server/utils"
-
-	"github.com/flipped-aurora/gin-vue-admin/server/global"
-	"github.com/flipped-aurora/gin-vue-admin/server/model/system"
-	"github.com/flipped-aurora/gin-vue-admin/server/service"
-	"github.com/gin-gonic/gin"
-	"go.uber.org/zap"
 )
 
 var operationRecordService = service.ServiceGroupApp.SystemServiceGroup.OperationRecordService
@@ -26,14 +24,14 @@ func OperationRecord() gin.HandlerFunc {
 			var err error
 			body, err = ioutil.ReadAll(c.Request.Body)
 			if err != nil {
-				global.GVA_LOG.Error("read body from request error:", zap.Error(err))
+				global.GVA_LOG.Error("read body from request error:", zap.Any("err", err))
 			} else {
 				c.Request.Body = ioutil.NopCloser(bytes.NewBuffer(body))
 			}
 		}
-		claims, _ := utils.GetClaims(c)
-		if claims.ID != 0 {
-			userId = int(claims.ID)
+		if claims, ok := c.Get("claims"); ok {
+			waitUse := claims.(*request.CustomClaims)
+			userId = int(waitUse.ID)
 		} else {
 			id, err := strconv.Atoi(c.Request.Header.Get("x-user-id"))
 			if err != nil {
@@ -63,14 +61,14 @@ func OperationRecord() gin.HandlerFunc {
 
 		c.Next()
 
-		latency := time.Since(now)
+		latency := time.Now().Sub(now)
 		record.ErrorMessage = c.Errors.ByType(gin.ErrorTypePrivate).String()
 		record.Status = c.Writer.Status()
 		record.Latency = latency
 		record.Resp = writer.body.String()
 
 		if err := operationRecordService.CreateSysOperationRecord(record); err != nil {
-			global.GVA_LOG.Error("create operation record error:", zap.Error(err))
+			global.GVA_LOG.Error("create operation record error:", zap.Any("err", err))
 		}
 	}
 }

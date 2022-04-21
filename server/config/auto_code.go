@@ -14,4 +14,5 @@ type Autocode struct {
 	WApi            string `mapstructure:"web-api" json:"webApi" yaml:"web-api"`
 	WForm           string `mapstructure:"web-form" json:"webForm" yaml:"web-form"`
 	WTable          string `mapstructure:"web-table" json:"webTable" yaml:"web-table"`
+	WFlow           string `mapstructure:"web-flow" json:"webFlow" yaml:"web-flow"`
 }

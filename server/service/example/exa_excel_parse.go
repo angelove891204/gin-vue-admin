@@ -3,14 +3,14 @@ package example
 import (
 	"errors"
 	"fmt"
+	"gin-vue-admin/global"
+	"gin-vue-admin/model/system"
+	"github.com/360EntSecGroup-Skylar/excelize/v2"
 	"strconv"
-
-	"github.com/flipped-aurora/gin-vue-admin/server/global"
-	"github.com/flipped-aurora/gin-vue-admin/server/model/system"
-	"github.com/xuri/excelize/v2"
 )
 
-type ExcelService struct{}
+type ExcelService struct {
+}
 
 func (exa *ExcelService) ParseInfoList2Excel(infoList []system.SysBaseMenu, filePath string) error {
 	excel := excelize.NewFile()

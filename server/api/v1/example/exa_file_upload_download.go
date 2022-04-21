@@ -1,16 +1,17 @@
 package example
 
 import (
-	"github.com/flipped-aurora/gin-vue-admin/server/global"
-	"github.com/flipped-aurora/gin-vue-admin/server/model/common/request"
-	"github.com/flipped-aurora/gin-vue-admin/server/model/common/response"
-	"github.com/flipped-aurora/gin-vue-admin/server/model/example"
-	exampleRes "github.com/flipped-aurora/gin-vue-admin/server/model/example/response"
+	"gin-vue-admin/global"
+	"gin-vue-admin/model/common/request"
+	"gin-vue-admin/model/common/response"
+	"gin-vue-admin/model/example"
+	exampleRes "gin-vue-admin/model/example/response"
 	"github.com/gin-gonic/gin"
 	"go.uber.org/zap"
 )
 
-type FileUploadAndDownloadApi struct{}
+type FileUploadAndDownloadApi struct {
+}
 
 // @Tags ExaFileUploadAndDownload
 // @Summary 上传文件示例
@@ -25,13 +26,13 @@ func (u *FileUploadAndDownloadApi) UploadFile(c *gin.Context) {
 	noSave := c.DefaultQuery("noSave", "0")
 	_, header, err := c.Request.FormFile("file")
 	if err != nil {
-		global.GVA_LOG.Error("接收文件失败!", zap.Error(err))
+		global.GVA_LOG.Error("接收文件失败!", zap.Any("err", err))
 		response.FailWithMessage("接收文件失败", c)
 		return
 	}
 	err, file = fileUploadAndDownloadService.UploadFile(header, noSave) // 文件上传后拿到文件路径
 	if err != nil {
-		global.GVA_LOG.Error("修改数据库链接失败!", zap.Error(err))
+		global.GVA_LOG.Error("修改数据库链接失败!", zap.Any("err", err))
 		response.FailWithMessage("修改数据库链接失败", c)
 		return
 	}
@@ -49,7 +50,7 @@ func (u *FileUploadAndDownloadApi) DeleteFile(c *gin.Context) {
 	var file example.ExaFileUploadAndDownload
 	_ = c.ShouldBindJSON(&file)
 	if err := fileUploadAndDownloadService.DeleteFile(file); err != nil {
-		global.GVA_LOG.Error("删除失败!", zap.Error(err))
+		global.GVA_LOG.Error("删除失败!", zap.Any("err", err))
 		response.FailWithMessage("删除失败", c)
 		return
 	}
@@ -69,7 +70,7 @@ func (u *FileUploadAndDownloadApi) GetFileList(c *gin.Context) {
 	_ = c.ShouldBindJSON(&pageInfo)
 	err, list, total := fileUploadAndDownloadService.GetFileRecordInfoList(pageInfo)
 	if err != nil {
-		global.GVA_LOG.Error("获取失败!", zap.Error(err))
+		global.GVA_LOG.Error("获取失败!", zap.Any("err", err))
 		response.FailWithMessage("获取失败", c)
 	} else {
 		response.OkWithDetailed(response.PageResult{
